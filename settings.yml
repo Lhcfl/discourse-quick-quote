@@ -1,3 +1,8 @@
+quick_quote_use_raw_post:
+  type: bool
+  default: true
+  description:
+    en: "Use raw markdown instead of cooked html (Will send an ajax)"
 quick_quote_post_location_threshold:
   type: integer
   default: 3
