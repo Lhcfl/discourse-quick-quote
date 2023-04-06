@@ -1,6 +1,7 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import Composer from "discourse/models/composer";
 import { buildQuote } from "discourse/lib/quote";
+import { ajax } from "discourse/lib/ajax";
 
 const PLUGIN_ID = "discourse-quick-quote";
 
