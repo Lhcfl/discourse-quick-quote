@@ -1,7 +1,6 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 import Composer from "discourse/models/composer";
 import { buildQuote } from "discourse/lib/quote";
-import { ajax } from "discourse/lib/ajax";
 
 const PLUGIN_ID = "discourse-quick-quote";
 
@@ -42,7 +41,7 @@ export default {
                   settings.quick_quote_post_location_threshold
                 ) {
                   if (settings.quick_quote_use_raw_post) {
-                    quotedText = '\n' + await ajax(`/posts/${post.id}/raw`);
+                    quotedText = '\n' + await $.ajax(`/posts/${post.id}/raw`);
                     if (settings.quick_quote_remove_prior_quotes) {
                       quotedText = quotedText.replace(
                         /<aside[\s\S]*<\/aside>/g,
