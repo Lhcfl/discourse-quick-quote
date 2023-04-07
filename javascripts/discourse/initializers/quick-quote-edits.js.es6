@@ -64,6 +64,11 @@ export default {
                       if (
                         quotedText.length > settings.quick_quote_character_limit
                       ) {
+                        quotedText = quotedText.replace(/<[^>]*>/g, ""); // remove HTML tags
+                      }
+                      if (
+                        quotedText.length > settings.quick_quote_character_limit
+                      ) {
                         quotedText = quotedText.replaceAll(/\[[^\]]+?\][^\(][\s\S]+?\[\/[a-z]*\]/g, " "); // remove bbcode tags
                         quotedText = quotedText.replaceAll(/```\[[\s\S]*```/g, " "); //remove codeblock
                       }
@@ -86,7 +91,22 @@ export default {
                         quotedText = quotedText.substring(0, settings.quick_quote_character_limit) + "...";
                       }
                     }
-                    quotedText = buildQuote(post, quotedText);
+                    quotedText = quotedText.trim();
+                    if (quotedText !== "") {
+                      quotedText = buildQuote(post, quotedText);
+                    } else {
+                      quotedText = post.cooked;
+                      quotedText = quotedText.replace(
+                        /<aside[\s\S]*<\/aside>/g,
+                        ""
+                      );
+                      quotedText = quotedText.replace(/<[^>]*>/g, ""); // remove HTML tags
+                      quotedText = quotedText.substring(0, settings.quick_quote_character_limit) + "...";
+                      quotedText = quotedText.trim();
+           
+                      quotedText = buildQuote(post, quotedText);
+                    }
+                    
                   } else {
                     quotedText = buildQuote(post, post.cooked);
   
