@@ -106,10 +106,16 @@ export default {
                         ""
                       );
                       quotedText = quotedText.replace(/<[^>]*>/g, ""); // remove HTML tags
-                      quotedText = quotedText.substring(0, settings.quick_quote_character_limit) + "...";
-                      quotedText = quotedText.trim();
+                      if (
+                        quotedText.length > 1.5 * settings.quick_quote_character_limit
+                      ) {
+                        quotedText = '';
+                      } else {
+                        quotedText = quotedText.substring(0, settings.quick_quote_character_limit) + "...";
+                        quotedText = quotedText.trim();
            
-                      quotedText = buildQuote(post, quotedText);
+                        quotedText = buildQuote(post, quotedText);
+                      }
                     }
                     
                   } else {
