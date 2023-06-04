@@ -84,6 +84,11 @@ export default {
                         quotedText = quotedText.replaceAll(/\]\([^\)]*?\)/g, " "); // remove links
                       }
                       if (
+                        quotedText.length > 2 * settings.quick_quote_character_limit
+                      ) {
+                        quotedText = '';
+                      }
+                      if (
                         quotedText.length > settings.quick_quote_character_limit
                       ) {
                         quotedText = quotedText.replaceAll("**", " "); // remove Bold
@@ -92,11 +97,6 @@ export default {
                       }
                     }
                     quotedText = quotedText.trim();
-                    if (
-                      quotedText.length > 2 * settings.quick_quote_character_limit
-                    ) {
-                      quotedText = '';
-                    }
                     if (quotedText !== "") {
                       quotedText = buildQuote(post, quotedText);
                     } else {
