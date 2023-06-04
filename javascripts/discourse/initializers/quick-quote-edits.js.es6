@@ -40,138 +40,148 @@ export default {
                   topic.highest_post_number + 1 - post.post_number >
                   settings.quick_quote_post_location_threshold
                 ) {
-                  if (settings.quick_quote_use_raw_post) {
-                    quotedText = '\n' + await $.ajax(`/posts/${post.id}/raw`);
-                    if (settings.quick_quote_remove_prior_quotes) {
-                      quotedText = quotedText.replace(
-                        /<aside[\s\S]*<\/aside>/g,
-                        ""
-                      );
-                      quotedText = quotedText.replace(
-                        /<blockquote[\s\S]*<\/blockquote>/g,
-                        ""
-                      );
-                      quotedText = quotedText.replace(
-                        /\n>[^\n]*/g,
-                        ""
-                      );
-                      quotedText = quotedText.replace(
-                        /\[quote[\s\S]*?\[\/quote\]/g,
-                        ""
-                      );
-                    }
-                    if (settings.quick_quote_character_limit) {
-                      if (
-                        quotedText.length > settings.quick_quote_character_limit
-                      ) {
-                        quotedText = quotedText.replace(/<[^>]*>/g, ""); // remove HTML tags
-                      }
-                      if (
-                        quotedText.length > settings.quick_quote_character_limit
-                      ) {
-                        quotedText = quotedText.replaceAll(/\[[^\]]+?\][^\(][\s\S]+?\[\/[a-z]*\]/g, " "); // remove bbcode tags
-                        quotedText = quotedText.replaceAll(/```\[[\s\S]*```/g, " "); //remove codeblock
-                      }
-                      if (
-                        quotedText.length > settings.quick_quote_character_limit
-                      ) {
-                        quotedText = quotedText.replaceAll(/\!\[[\s\S][^\]]*?\]\([\s\S]*?\)/g, " "); // remove images
-                      }
-                      if (
-                        quotedText.length > settings.quick_quote_character_limit
-                      ) {
-                        quotedText = quotedText.replaceAll("[", "");
-                        quotedText = quotedText.replaceAll(/\]\([^\)]*?\)/g, " "); // remove links
-                      }
-                      if (
-                        quotedText.length > 2 * settings.quick_quote_character_limit
-                      ) {
-                        quotedText = '';
-                      }
-                      if (
-                        quotedText.length > settings.quick_quote_character_limit
-                      ) {
-                        quotedText = quotedText.replaceAll("**", " "); // remove Bold
-                        quotedText = quotedText.replaceAll("__", " "); // remove Italic
-                        quotedText = quotedText.substring(0, settings.quick_quote_character_limit) + "...";
-                      }
-                    }
-                    quotedText = quotedText.trim();
-                    if (quotedText !== "") {
-                      quotedText = buildQuote(post, quotedText);
-                    } else {
-                      quotedText = post.cooked;
-                      quotedText = quotedText.replace(
-                        /<aside[\s\S]*<\/aside>/g,
-                        ""
-                      );
-                      quotedText = quotedText.replace(/<[^>]*>/g, ""); // remove HTML tags
-                      if (
-                        quotedText.length > 1.5 * settings.quick_quote_character_limit
-                      ) {
-                        quotedText = '';
-                      } else {
-                        quotedText = quotedText.substring(0, settings.quick_quote_character_limit) + "...";
-                        quotedText = quotedText.trim();
-           
-                        quotedText = buildQuote(post, quotedText);
-                      }
-                    }
-                    
-                  } else {
-                    quotedText = buildQuote(post, post.cooked);
-  
-                    if (settings.quick_quote_remove_prior_quotes) {
-                      quotedText = quotedText.replace(
-                        /<aside[\s\S]*<\/aside>/g,
-                        ""
-                      );
-                    }
-                    if (settings.quick_quote_remove_links) {
-                      quotedText = quotedText.replace(/<a[\s\S]*<\/a>/g, "");
-                    }
-                    const startOfQuoteText = quotedText.indexOf("]") + 2; // not forgetting the new line char
-                    const lengthOfEndQuoteTag = 11; // [/quote] and newline preceeding
-                    var startOfExcerpt = startOfQuoteText;
-                    var excerpt = "";
-                    if (settings.quick_quote_remove_contiguous_new_lines) {
-                      excerpt = quotedText.substring(
-                        startOfExcerpt,
-                        quotedText.length - lengthOfEndQuoteTag
-                      );
-                      excerpt = excerpt.replace(/\n*\n/g, "");
-                      quotedText =
-                        quotedText.substring(0, startOfQuoteText) +
-                        excerpt +
-                        quotedText.substring(
-                          quotedText.length - lengthOfEndQuoteTag,
-                          quotedText.length
+                  quotedText = post.cooked;
+                  quotedText = quotedText.replace(
+                    /<aside[\s\S]*<\/aside>/g,
+                    ""
+                  );
+                  quotedText = quotedText.replace(/<[^>]*>/g, ""); // remove HTML tags
+                  if (
+                    !(settings.quick_quote_character_limit && quotedText.length > 1.5 * settings.quick_quote_character_limit)
+                  ) {
+                    if (settings.quick_quote_use_raw_post) {
+                      quotedText = '\n' + await $.ajax(`/posts/${post.id}/raw`);
+                      if (settings.quick_quote_remove_prior_quotes) {
+                        quotedText = quotedText.replace(
+                          /<aside[\s\S]*<\/aside>/g,
+                          ""
                         );
-                    }
-                    if (settings.quick_quote_character_limit) {
-                      if (
-                        quotedText.length > 2 * settings.quick_quote_character_limit
-                      ) {
-                        quotedText = '';
+                        quotedText = quotedText.replace(
+                          /<blockquote[\s\S]*<\/blockquote>/g,
+                          ""
+                        );
+                        quotedText = quotedText.replace(
+                          /\n>[^\n]*/g,
+                          ""
+                        );
+                        quotedText = quotedText.replace(
+                          /\[quote[\s\S]*?\[\/quote\]/g,
+                          ""
+                        );
                       }
-                      if (
-                        quotedText.length > settings.quick_quote_character_limit
-                      ) {
-                        quotedText = quotedText.replace(/<[^>]*>/g, ""); // remove tags because you are splitting text so can't guarantee where
-                        startOfExcerpt =
-                          quotedText.length -
-                            lengthOfEndQuoteTag -
-                            settings.quick_quote_character_limit <
-                          startOfQuoteText
-                            ? startOfQuoteText
-                            : quotedText.length -
-                              settings.quick_quote_character_limit -
-                              lengthOfEndQuoteTag -
-                              2;
+                      if (settings.quick_quote_character_limit) {
+                        if (
+                          quotedText.length > settings.quick_quote_character_limit
+                        ) {
+                          quotedText = quotedText.replace(/<[^>]*>/g, ""); // remove HTML tags
+                        }
+                        if (
+                          quotedText.length > settings.quick_quote_character_limit
+                        ) {
+                          quotedText = quotedText.replaceAll(/\[[^\]]+?\][^\(][\s\S]+?\[\/[a-z]*\]/g, " "); // remove bbcode tags
+                          quotedText = quotedText.replaceAll(/```\[[\s\S]*```/g, " "); //remove codeblock
+                        }
+                        if (
+                          quotedText.length > settings.quick_quote_character_limit
+                        ) {
+                          quotedText = quotedText.replaceAll(/\!\[[\s\S][^\]]*?\]\([\s\S]*?\)/g, " "); // remove images
+                        }
+                        if (
+                          quotedText.length > settings.quick_quote_character_limit
+                        ) {
+                          quotedText = quotedText.replaceAll("[", "");
+                          quotedText = quotedText.replaceAll(/\]\([^\)]*?\)/g, " "); // remove links
+                        }
+                        if (
+                          quotedText.length > 2 * settings.quick_quote_character_limit
+                        ) {
+                          quotedText = '';
+                        }
+                        if (
+                          quotedText.length > settings.quick_quote_character_limit
+                        ) {
+                          quotedText = quotedText.replaceAll("**", " "); // remove Bold
+                          quotedText = quotedText.replaceAll("__", " "); // remove Italic
+                          quotedText = quotedText.substring(0, settings.quick_quote_character_limit) + "...";
+                        }
+                      }
+                      quotedText = quotedText.trim();
+                      if (quotedText !== "") {
+                        quotedText = buildQuote(post, quotedText);
+                      } else {
+                        quotedText = post.cooked;
+                        quotedText = quotedText.replace(
+                          /<aside[\s\S]*<\/aside>/g,
+                          ""
+                        );
+                        quotedText = quotedText.replace(/<[^>]*>/g, ""); // remove HTML tags
+                        if (
+                          quotedText.length > 1.5 * settings.quick_quote_character_limit
+                        ) {
+                          quotedText = '';
+                        } else {
+                          quotedText = quotedText.substring(0, settings.quick_quote_character_limit) + "...";
+                          quotedText = quotedText.trim();
+            
+                          quotedText = buildQuote(post, quotedText);
+                        }
+                      }
+                      
+                    } else {
+                      quotedText = buildQuote(post, post.cooked);
+    
+                      if (settings.quick_quote_remove_prior_quotes) {
+                        quotedText = quotedText.replace(
+                          /<aside[\s\S]*<\/aside>/g,
+                          ""
+                        );
+                      }
+                      if (settings.quick_quote_remove_links) {
+                        quotedText = quotedText.replace(/<a[\s\S]*<\/a>/g, "");
+                      }
+                      const startOfQuoteText = quotedText.indexOf("]") + 2; // not forgetting the new line char
+                      const lengthOfEndQuoteTag = 11; // [/quote] and newline preceeding
+                      var startOfExcerpt = startOfQuoteText;
+                      var excerpt = "";
+                      if (settings.quick_quote_remove_contiguous_new_lines) {
+                        excerpt = quotedText.substring(
+                          startOfExcerpt,
+                          quotedText.length - lengthOfEndQuoteTag
+                        );
+                        excerpt = excerpt.replace(/\n*\n/g, "");
                         quotedText =
                           quotedText.substring(0, startOfQuoteText) +
-                          "..." +
-                          quotedText.substring(startOfExcerpt, quotedText.length);
+                          excerpt +
+                          quotedText.substring(
+                            quotedText.length - lengthOfEndQuoteTag,
+                            quotedText.length
+                          );
+                      }
+                      if (settings.quick_quote_character_limit) {
+                        if (
+                          quotedText.length > 2 * settings.quick_quote_character_limit
+                        ) {
+                          quotedText = '';
+                        }
+                        if (
+                          quotedText.length > settings.quick_quote_character_limit
+                        ) {
+                          quotedText = quotedText.replace(/<[^>]*>/g, ""); // remove tags because you are splitting text so can't guarantee where
+                          startOfExcerpt =
+                            quotedText.length -
+                              lengthOfEndQuoteTag -
+                              settings.quick_quote_character_limit <
+                            startOfQuoteText
+                              ? startOfQuoteText
+                              : quotedText.length -
+                                settings.quick_quote_character_limit -
+                                lengthOfEndQuoteTag -
+                                2;
+                          quotedText =
+                            quotedText.substring(0, startOfQuoteText) +
+                            "..." +
+                            quotedText.substring(startOfExcerpt, quotedText.length);
+                        }
                       }
                     }
                   }
