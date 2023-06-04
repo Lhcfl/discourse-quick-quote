@@ -92,6 +92,11 @@ export default {
                       }
                     }
                     quotedText = quotedText.trim();
+                    if (
+                      quotedText.length > 2 * settings.quick_quote_character_limit
+                    ) {
+                      quotedText = '';
+                    }
                     if (quotedText !== "") {
                       quotedText = buildQuote(post, quotedText);
                     } else {
