@@ -35,7 +35,7 @@ export default {
             var quotedText = "";
 
             if (quoteState.buffer == "" || quoteState.buffer == undefined) {
-              if (post && post.cooked?.length <= 2 * settings.quick_quote_character_limit) {
+              if (post && post.cooked?.length <= 4 * settings.quick_quote_character_limit) {
                 if (
                   topic.highest_post_number + 1 - post.post_number >
                   settings.quick_quote_post_location_threshold
